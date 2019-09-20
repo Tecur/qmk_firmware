@@ -1,14 +1,34 @@
 #include QMK_KEYBOARD_H
 #include "keymap_german.h"
 
+//Macro enum
+enum custom_keycodes {
+  TS_MUTE = SAFE_RANGE,
+  TS_DEAF
+  //add more here...
+};
+
 //Layer names
 #define BASE 0 // default layer
 #define FNT 1 // symbol layer
 
 //Color names
 #define HSV_STATIC 121, 133, 118    //Static Color
-#define HSV_CAPS 121, 133, 118    //Caps Indicator Color
-#define HSV_LAYER 121, 133, 118    //First Layer Color
+#define HSV_CAPS 0, 255, 255    //Caps Indicator Color
+#define HSV_LAYER 30, 218, 218   //Second Layer Color
+
+//Variables
+bool is_caps_active = false;
+bool is_layer_active = false;
+//Variables to remeber last Color for Caps
+uint8_t last_color_hue = 121;
+uint8_t last_color_sat = 133;
+uint8_t last_color_val = 118;
+
+//Variables to remeber last Color for Layer
+uint8_t layer_last_color_hue = 121;
+uint8_t layer_last_color_sat = 133;
+uint8_t layer_last_color_val = 118;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -23,7 +43,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [FNT] = LAYOUT(
     _______,  KC_WHOM,  KC_MYCM,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,
-    _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  RESET,    _______,
+    _______,  TS_MUTE,  TS_DEAF,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  RESET,    _______,
     _______,  RGB_TOG,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,            _______,  KC_VOLU,
     _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,                      _______,  KC_VOLD,
     _______,  _______,  _______,  _______,  BL_DEC,   BL_TOGG,  BL_INC,   BL_STEP,  _______,  _______,  _______,  _______,  _______,            _______,  KC_MUTE,
@@ -37,14 +57,66 @@ void matrix_init_user(void) {  // Runs boot tasks for keyboard
     rgblight_mode(0);   //No animation
 };
 
+//Macro events
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {
+    case TS_MUTE:                                   // TS/Discord MUTE
+      if (record->event.pressed) {
+        // when keycode TS_MUTE is pressed
+        SEND_STRING(SS_LCTRL(SS_LALT(SS_LSFT(SS_TAP(X_END)))));
+      } else {
+        // when keycode TS_MUTE is released
+      }
+      break;
+    case TS_DEAF:                                 // TS/Discord DEAF
+      if (record->event.pressed) {
+        // when keycode TS_DEAF is pressed
+        SEND_STRING(SS_LCTRL(SS_LALT(SS_LSFT(SS_TAP(X_HOME)))));
+      } else {
+        // when keycode TS_DEAF is released
+      }
+      break;
+      case KC_CAPS:                                 // Caps Lock
+        if (record->event.pressed) {
+          // when Caps Lock is pressed
+          is_caps_active = !is_caps_active;
+          if (is_caps_active) {                   //Update Caps Lock Color
+              last_color_hue = rgblight_get_hue();
+              last_color_sat = rgblight_get_sat();
+              last_color_val = rgblight_get_val();
+              rgblight_sethsv(HSV_CAPS);
+          } else {
+              rgblight_sethsv(last_color_hue,last_color_sat,last_color_val);
+          }
+        } else {
+          // when Caps Lock is released
+        }
+        break;
+        /*
+        case MO(FNT):                                 // Second Layer
+          if (record->event.pressed) {
+            // when Layer Key is pressed
+            is_layer_active = true;
+            layer_last_color_hue = rgblight_get_hue();
+            layer_last_color_sat = rgblight_get_sat();
+            layer_last_color_val = rgblight_get_val();
+            rgblight_sethsv(HSV_LAYER);
+          } else {
+            // when Layer Key is released
+            is_layer_active = false;
+            rgblight_sethsv(layer_last_color_hue,layer_last_color_sat,layer_last_color_val);
+          }
+          break;
+          */
+      //add more here...
+  }
+  return true;  //for use later
+};
+
 /*
 Planned:
-    - Macro for TS/Discord Mute
-    - Macro for TS/Discord Deaf
+    - Layer Indicator debug (funktionier nicht mit Caps), evtl. neue Methode
     - More Macros
-    - More Animations?
-    - RGB Caps Lock Indicator
-    - RGB Layer Indicator?
 		- Diffrent Light Scenes for Debug, Bootloader, etc.
 		- Debug Log output???
 */
