@@ -9,6 +9,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    - name: Setup
+      run: sudo apt-get install gcc-avr
     - name: Make
       run: make kbdfans/kbd75/rev1:tecur
     - name: make check
