@@ -3,14 +3,12 @@ name: Build my keyboards
 on: [push]
 
 jobs:
-  build_kbd75_tecur:
+  KBD75-Tecur:
 
     runs-on: ubuntu-latest
     
     steps:
     - uses: actions/checkout@v1
-    - name: Configure
-      run: ./configure
     - name: Make
       run: make kbdfans/kbd75/rev1:tecur
     - name: make check
