@@ -9,8 +9,12 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-    - name: Setup
-      run: sudo apt-get install gcc-avr
+    - name: Setup Environment
+      run: |
+          apt-get install git
+          git clone --recurse-submodules https://github.com/qmk/qmk_firmware.git
+          cd qmk_firmware
+          util/qmk_install.sh
     - name: Make
       run: make kbdfans/kbd75/rev1:tecur
     - name: make check
