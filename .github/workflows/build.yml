@@ -3,7 +3,7 @@ name: Build my keyboards
 on: [push]
 
 jobs:
-  Build KBD75 Tecur:
+  build_kbd75_tecur:
 
     runs-on: ubuntu-latest
     
