@@ -4,7 +4,7 @@
 //Macro enum
 enum custom_keycodes {
   TS_MUTE = SAFE_RANGE,
-  TS_DEAF
+  TS_DEAF,
   //add more here...
 };
 
@@ -13,22 +13,13 @@ enum custom_keycodes {
 #define FNT 1 // symbol layer
 
 //Color names
-#define HSV_STATIC 121, 133, 118    //Static Color
+#define HSV_BASE 121, 133, 118    //Static Color
 #define HSV_CAPS 0, 255, 255    //Caps Indicator Color
-#define HSV_LAYER 30, 218, 218   //Second Layer Color
+#define HSV_FNT 30, 218, 218   //Second Layer Color
 
 //Variables
 bool is_caps_active = false;
-bool is_layer_active = false;
-//Variables to remeber last Color for Caps
-uint8_t last_color_hue = 121;
-uint8_t last_color_sat = 133;
-uint8_t last_color_val = 118;
-
-//Variables to remeber last Color for Layer
-uint8_t layer_last_color_hue = 121;
-uint8_t layer_last_color_sat = 133;
-uint8_t layer_last_color_val = 118;
+uint8_t active_layer = BASE;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -42,20 +33,34 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 
   [FNT] = LAYOUT(
-    _______,  KC_WHOM,  KC_MYCM,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,
-    _______,  TS_MUTE,  TS_DEAF,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  RESET,    _______,
-    _______,  RGB_TOG,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,            _______,  KC_VOLU,
-    _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,                      _______,  KC_VOLD,
-    _______,  _______,  _______,  _______,  BL_DEC,   BL_TOGG,  BL_INC,   BL_STEP,  _______,  _______,  _______,  _______,  _______,            _______,  KC_MUTE,
+    _______,  TS_MUTE,  TS_DEAF,  KC_WHOM,  KC_MYCM,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,
+    _______,  KC_KP_1,  KC_KP_2,  KC_KP_3,  KC_KP_4,  KC_KP_5,  KC_KP_6,  KC_KP_7,  KC_KP_8,  KC_KP_9,  KC_KP_0,  KC_PSLS,  _______,  _______,  RESET,    _______,
+    _______,  RGB_TOG,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  KC_PPLS,            KC_PAST,  KC_VOLU,
+    _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,                      KC_PENT,  KC_VOLD,
+    _______,  _______,  _______,  _______,  BL_DEC,   BL_TOGG,  BL_INC,   BL_STEP,  _______,  KC_PCMM,  KC_PDOT,  KC_PMNS,  _______,            _______,  KC_MUTE,
     _______,  _______,  _______,                      _______,  _______,  _______,                      _______,  _______,  _______,  KC_MPRV,  KC_MPLY,  KC_MNXT
   ),
 };
 
 void matrix_init_user(void) {  // Runs boot tasks for keyboard
     rgblight_enable();
-    rgblight_sethsv(HSV_STATIC);
+    rgblight_sethsv(HSV_BASE);
     rgblight_mode(0);   //No animation
 };
+
+void update_rgblight(void) {
+  if (is_caps_active == false) {
+    switch(active_layer) {
+      case BASE:
+        rgblight_sethsv(HSV_BASE);
+        break;
+
+      case FNT:
+      rgblight_sethsv(HSV_FNT);
+        break;
+    }
+  }
+}
 
 //Macro events
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -81,33 +86,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           // when Caps Lock is pressed
           is_caps_active = !is_caps_active;
           if (is_caps_active) {                   //Update Caps Lock Color
-              last_color_hue = rgblight_get_hue();
-              last_color_sat = rgblight_get_sat();
-              last_color_val = rgblight_get_val();
               rgblight_sethsv(HSV_CAPS);
           } else {
-              rgblight_sethsv(last_color_hue,last_color_sat,last_color_val);
+              update_rgblight();
           }
         } else {
           // when Caps Lock is released
         }
         break;
-        /*
+
         case MO(FNT):                                 // Second Layer
           if (record->event.pressed) {
             // when Layer Key is pressed
-            is_layer_active = true;
-            layer_last_color_hue = rgblight_get_hue();
-            layer_last_color_sat = rgblight_get_sat();
-            layer_last_color_val = rgblight_get_val();
-            rgblight_sethsv(HSV_LAYER);
+            active_layer = FNT;
           } else {
             // when Layer Key is released
-            is_layer_active = false;
-            rgblight_sethsv(layer_last_color_hue,layer_last_color_sat,layer_last_color_val);
+            active_layer = BASE;
           }
+          update_rgblight();
           break;
-          */
+
       //add more here...
   }
   return true;  //for use later
@@ -115,8 +113,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 /*
 Planned:
-    - Layer Indicator debug (funktionier nicht mit Caps), evtl. neue Methode
     - More Macros
 		- Diffrent Light Scenes for Debug, Bootloader, etc.
-		- Debug Log output???
 */
