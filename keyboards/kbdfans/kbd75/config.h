@@ -3,10 +3,12 @@
 #include "config_common.h"
 
 /* USB Device descriptor parameter */
-#define VENDOR_ID       0x4B42
-#define MANUFACTURER    qmkbuilder
+#define VENDOR_ID       0xFEED
+#define PRODUCT_ID      0x6060
+#define DEVICE_VER      0x0001
+#define MANUFACTURER    KBDfans
 #define PRODUCT         KBD75
-#define DESCRIPTION     QMK keyboard firmware for KBD75
+#define DESCRIPTION     Owner Joshua Stoll
 
 /* key matrix size */
 #define MATRIX_ROWS 6
@@ -37,12 +39,14 @@
 
 #define RGB_DI_PIN E2
 #ifdef RGB_DI_PIN
-#define RGBLIGHT_ANIMATIONS
+#undef RGBLED_NUM
+//#define RGBLIGHT_ANIMATIONS
+#define RGBLIGHT_EFFECT_RAINBOW_MOOD
 #define RGBLED_NUM 16
 #define RGBLIGHT_HUE_STEP 8
 #define RGBLIGHT_SAT_STEP 8
 #define RGBLIGHT_VAL_STEP 8
 #define RGBLIGHT_SLEEP
-/* If defined, the RGB lighting will be switched off when the host goes to sleep */
-#define RGBLIGHT_SLEEP
+#endif
+
 #endif
