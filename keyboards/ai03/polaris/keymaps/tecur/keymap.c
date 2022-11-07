@@ -10,6 +10,7 @@ enum layer_names {
 enum custom_keycodes {
   TS_MUTE = SAFE_RANGE,
   TS_DEAF,
+  PRT_SCR,
   //add more here...
 };
 
@@ -22,10 +23,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_LCTL, KC_LGUI, KC_LALT,          KC_SPC,           KC_SPC,           KC_SPC,                    KC_RALT, KC_RGUI, KC_APP,  KC_RCTL
   ),
   [_FN] = LAYOUT_all( /* FN */
-    RESET,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,  _______,
-    DE_CIRC, KC_MYCM, KC_UP,   _______, _______, _______, _______, _______, _______, _______, KC_MPRV, KC_MPLY, KC_MNXT,          _______,
-    KC_WHOM, KC_LEFT, KC_DOWN, KC_RIGHT,_______, KC_VOLD, KC_VOLU, _______, _______, _______, _______, _______,                   _______,
-    KC_PGUP, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          KC_PSCR, _______,
+    _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,  _______,
+    DE_CIRC, KC_MYCM, KC_UP,   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,
+    KC_WHOM, KC_LEFT, KC_DOWN, KC_RIGHT,_______, _______, _______, _______, _______, _______, _______, _______,                   _______,
+    KC_PGUP, _______, _______, _______, _______, _______, _______, _______, _______, KC_MPRV, KC_MPLY, KC_MNXT, PRT_SCR,          _______,
     KC_PGDN, TS_MUTE, TS_DEAF,          _______,          _______,          _______,                   _______, _______, _______, _______
   )
 };
@@ -45,6 +46,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       if (record->event.pressed) {
         // when keycode TS_DEAF is pressed
         SEND_STRING(SS_LCTRL(SS_LALT(SS_LSFT(SS_TAP(X_HOME)))));
+      } else {
+        // when keycode TS_DEAF is released
+      }
+      break;
+    case PRT_SCR:                                 // Snippet Tool
+      if (record->event.pressed) {
+        // when keycode PRT_SCR is pressed
+        SEND_STRING(SS_LSFT(SS_LGUI("s")));
       } else {
         // when keycode TS_DEAF is released
       }
