@@ -37,7 +37,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
     case CTRL_M:                                   // CTRL + M
       if (record->event.pressed) {
-        SEND_STRING(SS_LCTRL("M"));
+        SEND_STRING(SS_LCTRL("m"));
       } else {
       }
       break;
