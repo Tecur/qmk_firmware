@@ -29,8 +29,8 @@ void DRV_write(uint8_t drv_register, uint8_t settings) {
     i2c_transmit(DRV2605L_BASE_ADDRESS << 1, DRV2605L_transfer_buffer, 2, 100);
 }
 
-uint8_t DRV_read(uint8_t regaddress) {
-    i2c_readReg(DRV2605L_BASE_ADDRESS << 1, regaddress, &DRV2605L_read_register, 1, 100);
+uint8_t drv2605l_read(uint8_t reg_addr) {
+    i2c_read_register(DRV2605L_I2C_ADDRESS << 1, reg_addr, &drv2605l_read_buffer, 1, 100);
 
     return DRV2605L_read_register;
 }
